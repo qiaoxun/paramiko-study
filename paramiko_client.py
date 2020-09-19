@@ -13,6 +13,7 @@ class ParamikoClient(object):
         self.password = config.get('ssh', 'password')
         self.timeout = float(config.get('ssh', 'timeout'))
         self.client = paramiko.SSHClient()
+        self.sftp_client = None
         self.client.load_system_host_keys()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print(self.client)
@@ -32,3 +33,7 @@ class ParamikoClient(object):
         for line in stdout:
             print(line)
 
+    def get_sftp_client(self):
+        if not self.sftp_client:
+            self.sftp_client = paramiko.SFTPClient.(sefrom_transportlf.client.get_transport())
+        return self.sftp_client
