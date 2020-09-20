@@ -19,11 +19,21 @@ from paramiko_client import ParamikoClient
 #     client.run_command('echo $PATH')
 
 
-def upload_file():
+# def upload_file():
+#     client = ParamikoClient('config.ini')
+#     # client.connect()
+#     sftp_client = client.get_sftp_client()
+#     sftp_client.put('C:/Users/qiaox.CORPDOM/Desktop/sys_roles_menus.sql', '/home/joey/aaa.sql')
+#     client.run_command('ls /home/joey')
+#
+#
+# upload_file()
+
+
+def start_django_project():
     client = ParamikoClient('config.ini')
     client.connect()
-    sftp_client = client.get_sftp_client()
-    sftp_client.put('C:/Users/qiaox.CORPDOM/Desktop/Script/test.s    h', '/home/joey')
-    client.run_command('ls /home/joey')
+    client.run_command('source /home/joey/study/django/python38env/bin/activate && cd /media/sf_dev-ops/rest_xops && python manage.py runserver 0:8003 2>&1')
 
-upload_file()
+
+start_django_project()
