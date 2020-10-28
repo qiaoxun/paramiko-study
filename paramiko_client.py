@@ -4,14 +4,14 @@ import configparser
 
 class ParamikoClient(object):
 
-    def __init__(self, config_file):
+    def __init__(self, config_file, key='ssh'):
         config = configparser.ConfigParser()
         config.read(config_file)
-        self.host = config.get('ssh', 'host')
-        self.port = int(config.get('ssh', 'port'))
-        self.username = config.get('ssh', 'username')
-        self.password = config.get('ssh', 'password')
-        self.timeout = float(config.get('ssh', 'timeout'))
+        self.host = config.get(key, 'host')
+        self.port = int(config.get(key, 'port'))
+        self.username = config.get(key, 'username')
+        self.password = config.get(key, 'password')
+        self.timeout = float(config.get(key, 'timeout'))
         self.client = paramiko.SSHClient()
         self.client_connected = 0
         self.sftp_client = None
@@ -32,11 +32,15 @@ class ParamikoClient(object):
 
     def run_command(self, cmd_str):
         stdin, stdout, stderr = self.client.exec_command(cmd_str, get_pty=True)
-        while True:
-            next_line = stdout.readline().strip()  # 读取脚本输出内容
-            print('line: ' + next_line)
-            if next_line == 'Quit the server with CONTROL-C.':
-                break
+        # while True:
+        #     next_line = stdout.readline().strip()  # 读取脚本输出内容
+        #     print('line: ' + next_line)
+        #     if next_line == 'Quit the server with CONTROL-C.' or next_line is None:
+        #         break
+
+        # for line in iter(stdout.readline, ""):
+        #     print(line, end="")
+        return stdin, stdout, stderr
 
     def get_sftp_client(self):
         if self.client_connected == 0:

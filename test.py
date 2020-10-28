@@ -30,10 +30,55 @@ from paramiko_client import ParamikoClient
 # upload_file()
 
 
-def start_django_project():
-    client = ParamikoClient('config.ini')
+# def start_django_project():
+#     client = ParamikoClient('config.ini')
+#     client.connect()
+#     client.run_command('source /home/joey/study/django/python38env/bin/activate && cd /media/sf_dev-ops/rest_xops && python manage.py runserver 0:8003 2>&1')
+#
+# start_django_project()
+
+
+def connect_to_101():
+    client = ParamikoClient('config.ini', 'PPM101')
     client.connect()
-    client.run_command('source /home/joey/study/django/python38env/bin/activate && cd /media/sf_dev-ops/rest_xops && python manage.py runserver 0:8003 2>&1')
+    home = "/opt/ppm/ppm/"
+    # file = '/opt/ppm/ppm/QX_DEV_OPS_962_1/ppm962/test/install.log'
+    # cmd = 'file=' + file + '&&mkdir -p "${file%/*}" && touch "$file"'
+    _, stdout, _ = client.run_command("cd /opt/ppm/ppm/ && for i in $(ls -d */); do echo ${i}; done")
+
+    for line in iter(stdout.readline, ""):
+        print(line.strip())
+        if is_ppm_instance(home, line.strip(), client):
+            print("it's PPM instance")
 
 
-start_django_project()
+def is_ppm_instance(home, folder, client):
+    command = "cd " + home + folder + " && ls -l | grep server.conf | wc -l"
+    _, stdout, _ = client.run_command(command)
+    for count in iter(stdout.readline, ""):
+        if int(count) > 0:
+            read_server_conf_file(home, folder, client)
+            is_ppm_running(home, folder, client)
+    return False
+
+
+def read_server_conf_file(home, folder, client):
+    command = "cat " + home + folder + "server.conf"
+    _, stdout, _ = client.run_command(command)
+    try:
+        for line in iter(stdout.readline, ""):
+            if "com.kintana.core.server.BASE_URL" in line:
+                print(line)
+    except:
+        print("Unexpected error")
+
+
+def is_ppm_running(home, folder, client):
+    command = "ps -ef | grep " + home + folder + " | grep -v grep | wc -l"
+    _, stdout, _ = client.run_command(command)
+    for count in iter(stdout.readline, ""):
+        if int(count) > 0:
+            print(folder + "is running")
+
+
+connect_to_101()
