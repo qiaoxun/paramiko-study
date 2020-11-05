@@ -57,8 +57,9 @@ def is_ppm_instance(home, folder, client):
     _, stdout, _ = client.run_command(command)
     for count in iter(stdout.readline, ""):
         if int(count) > 0:
-            read_server_conf_file(home, folder, client)
-            is_ppm_running(home, folder, client)
+            # read_server_conf_file(home, folder, client)
+            # is_ppm_running(home, folder, client)
+            get_ppm_version(home, folder, client)
     return False
 
 
@@ -69,7 +70,7 @@ def read_server_conf_file(home, folder, client):
         for line in iter(stdout.readline, ""):
             if "com.kintana.core.server.BASE_URL" in line:
                 print(line)
-    except:
+    except Exception:
         print("Unexpected error")
 
 
@@ -81,4 +82,17 @@ def is_ppm_running(home, folder, client):
             print(folder + "is running")
 
 
+def get_ppm_version(home, folder, client):
+    command = "head " + home + folder + "conf/version.txt"
+    _, stdout, _ = client.run_command(command)
+    version = ""
+    for line in iter(stdout.readline, ""):
+        if len(version) > 0:
+            break
+        version = line.strip()
+    return version
+
+
 connect_to_101()
+
+
